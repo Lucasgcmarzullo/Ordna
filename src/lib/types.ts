@@ -4,9 +4,9 @@ export interface Task {
   id: string;
   title: string;
   completed: boolean;
-  priority: 'low' | 'medium' | 'high';
+  category: 'trabalho' | 'estudos' | 'saude' | 'pessoal';
+  priority?: 'low' | 'medium' | 'high';
   dueDate?: string;
-  category?: string;
   description?: string;
   createdAt: string;
 }
@@ -25,18 +25,19 @@ export interface CalendarEvent {
   id: string;
   title: string;
   date: string;
+  category: 'trabalho' | 'estudos' | 'saude' | 'pessoal';
   time?: string;
   description?: string;
-  color: string;
+  color?: string;
   createdAt: string;
 }
 
 export interface Transaction {
   id: string;
-  title: string;
+  description: string;
   amount: number;
   type: 'income' | 'expense';
-  category: string;
+  category: 'alimentacao' | 'transporte' | 'saude' | 'lazer' | 'salario' | 'outros';
   date: string;
   createdAt: string;
 }

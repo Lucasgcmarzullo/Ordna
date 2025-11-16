@@ -25,6 +25,33 @@ export const saveTasks = (tasks: Task[]): void => {
   localStorage.setItem(STORAGE_KEYS.TASKS, JSON.stringify(tasks));
 };
 
+export const addTask = (title: string, category: string): Task => {
+  const tasks = getTasks();
+  const newTask: Task = {
+    id: Date.now().toString(),
+    title,
+    completed: false,
+    category: category as 'trabalho' | 'estudos' | 'saude' | 'pessoal',
+    createdAt: new Date().toISOString(),
+  };
+  saveTasks([...tasks, newTask]);
+  return newTask;
+};
+
+export const updateTask = (id: string, updates: Partial<Task>): void => {
+  const tasks = getTasks();
+  const updatedTasks = tasks.map(task => 
+    task.id === id ? { ...task, ...updates } : task
+  );
+  saveTasks(updatedTasks);
+};
+
+export const deleteTask = (id: string): void => {
+  const tasks = getTasks();
+  const filteredTasks = tasks.filter(task => task.id !== id);
+  saveTasks(filteredTasks);
+};
+
 // Calendar Events
 export const getEvents = (): CalendarEvent[] => {
   if (typeof window === 'undefined') return [];
@@ -37,6 +64,33 @@ export const saveEvents = (events: CalendarEvent[]): void => {
   localStorage.setItem(STORAGE_KEYS.EVENTS, JSON.stringify(events));
 };
 
+export const addEvent = (title: string, date: string, category: string): CalendarEvent => {
+  const events = getEvents();
+  const newEvent: CalendarEvent = {
+    id: Date.now().toString(),
+    title,
+    date,
+    category: category as 'trabalho' | 'estudos' | 'saude' | 'pessoal',
+    createdAt: new Date().toISOString(),
+  };
+  saveEvents([...events, newEvent]);
+  return newEvent;
+};
+
+export const updateEvent = (id: string, updates: Partial<CalendarEvent>): void => {
+  const events = getEvents();
+  const updatedEvents = events.map(event => 
+    event.id === id ? { ...event, ...updates } : event
+  );
+  saveEvents(updatedEvents);
+};
+
+export const deleteEvent = (id: string): void => {
+  const events = getEvents();
+  const filteredEvents = events.filter(event => event.id !== id);
+  saveEvents(filteredEvents);
+};
+
 // Transactions
 export const getTransactions = (): Transaction[] => {
   if (typeof window === 'undefined') return [];
@@ -47,6 +101,40 @@ export const getTransactions = (): Transaction[] => {
 export const saveTransactions = (transactions: Transaction[]): void => {
   if (typeof window === 'undefined') return;
   localStorage.setItem(STORAGE_KEYS.TRANSACTIONS, JSON.stringify(transactions));
+};
+
+export const addTransaction = (
+  description: string, 
+  amount: number, 
+  type: string, 
+  category: string
+): Transaction => {
+  const transactions = getTransactions();
+  const newTransaction: Transaction = {
+    id: Date.now().toString(),
+    description,
+    amount,
+    type: type as 'income' | 'expense',
+    category: category as 'alimentacao' | 'transporte' | 'saude' | 'lazer' | 'salario' | 'outros',
+    date: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
+  };
+  saveTransactions([...transactions, newTransaction]);
+  return newTransaction;
+};
+
+export const updateTransaction = (id: string, updates: Partial<Transaction>): void => {
+  const transactions = getTransactions();
+  const updatedTransactions = transactions.map(transaction => 
+    transaction.id === id ? { ...transaction, ...updates } : transaction
+  );
+  saveTransactions(updatedTransactions);
+};
+
+export const deleteTransaction = (id: string): void => {
+  const transactions = getTransactions();
+  const filteredTransactions = transactions.filter(transaction => transaction.id !== id);
+  saveTransactions(filteredTransactions);
 };
 
 // Goals

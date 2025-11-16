@@ -4,25 +4,26 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { CheckSquare, Calendar, DollarSign, LayoutDashboard, Menu, X, Sparkles, Crown, LogOut, Clock, CalendarDays } from 'lucide-react';
 import dynamic from 'next/dynamic';
-import { getTasks, getEvents, getTransactions, getSubscription } from '@/lib/storage';
+import { getTasks, getEvents, getTransactions } from '@/lib/storage';
 import { getCurrentUser, logout } from '@/lib/auth';
 import { ModuleType } from '@/lib/types';
+import { useUser } from '@/contexts/UserContext';
 
 // Importação dinâmica dos módulos para evitar problemas de SSR
 const TasksModule = dynamic(() => import('@/components/custom/TasksModule'), { ssr: false });
 const CalendarModule = dynamic(() => import('@/components/custom/CalendarModule'), { ssr: false });
 const FinanceModule = dynamic(() => import('@/components/custom/FinanceModule'), { ssr: false });
-const AIAssistantModule = dynamic(() => import('@/components/custom/AIAssistantModule'), { ssr: false });
-const PremiumModule = dynamic(() => import('@/components/custom/PremiumModule'), { ssr: false });
+const AIAssistant = dynamic(() => import('@/components/custom/AIAssistantModule'), { ssr: false });
 const WeekPlannerModule = dynamic(() => import('@/components/custom/WeekPlannerModule'), { ssr: false });
 const FocusModeModule = dynamic(() => import('@/components/custom/FocusModeModule'), { ssr: false });
+const StripeCheckout = dynamic(() => import('@/components/custom/StripeCheckout'), { ssr: false });
 
 export default function Home() {
   const router = useRouter();
+  const { currentUser, isPremium, refreshUserData } = useUser();
   const [activeModule, setActiveModule] = useState<ModuleType>('dashboard');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isPremium, setIsPremium] = useState(false);
-  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [localUser, setLocalUser] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [stats, setStats] = useState({
     totalTasks: 0,
@@ -38,11 +39,11 @@ export default function Home() {
       router.push('/auth');
       return;
     }
-    setCurrentUser(user);
+    setLocalUser(user);
     setIsLoading(false);
 
-    const subscription = getSubscription();
-    setIsPremium(subscription.isPremium);
+    // Atualizar dados do usuário do Supabase
+    refreshUserData();
 
     const tasks = getTasks();
     const events = getEvents();
@@ -67,7 +68,7 @@ export default function Home() {
       upcomingEvents,
       balance: totalIncome - totalExpense,
     });
-  }, [activeModule, router]);
+  }, [activeModule, router, refreshUserData]);
 
   const handleLogout = () => {
     logout();
@@ -85,7 +86,7 @@ export default function Home() {
     { id: 'premium' as ModuleType, label: 'Premium', icon: Crown, highlight: true },
   ];
 
-  if (isLoading || !currentUser) {
+  if (isLoading || !localUser) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-500 via-blue-600 to-indigo-700">
         <div className="text-center">
@@ -112,8 +113,8 @@ export default function Home() {
             </div>
           )}
           <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
-            <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{currentUser.name}</p>
-            <p className="text-xs text-gray-500 dark:text-gray-400">{currentUser.email}</p>
+            <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{localUser.name}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">{localUser.email}</p>
           </div>
         </div>
 
@@ -190,8 +191,8 @@ export default function Home() {
         {isMobileMenuOpen && (
           <div className="mt-4 space-y-3">
             <div className="bg-gray-50 dark:bg-gray-700/50 p-3 rounded-lg">
-              <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{currentUser.name}</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">{currentUser.email}</p>
+              <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{localUser.name}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">{localUser.email}</p>
             </div>
             <nav className="space-y-2">
               {menuItems.map((item) => {
@@ -243,7 +244,7 @@ export default function Home() {
           <div className="space-y-6">
             <div>
               <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2">
-                Bem-vindo, {currentUser.name.split(' ')[0]}! 👋
+                Bem-vindo, {localUser.name.split(' ')[0]}! 👋
               </h2>
               <p className="text-gray-600 dark:text-gray-400">
                 Seu espaço de organização pessoal completo
@@ -436,7 +437,7 @@ export default function Home() {
         )}
         
         {activeModule === 'ai-assistant' && (
-          isPremium ? <AIAssistantModule /> : (
+          isPremium ? <AIAssistant /> : (
             <div className="text-center py-12">
               <Crown className="w-16 h-16 text-yellow-500 mx-auto mb-4" />
               <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2">
@@ -455,7 +456,7 @@ export default function Home() {
           )
         )}
         
-        {activeModule === 'premium' && <PremiumModule />}
+        {activeModule === 'premium' && <StripeCheckout />}
       </main>
     </div>
   );
