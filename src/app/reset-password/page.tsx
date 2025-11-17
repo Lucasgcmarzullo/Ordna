@@ -23,6 +23,11 @@ function ResetPasswordContent() {
   useEffect(() => {
     const checkSession = async () => {
       try {
+        if (!supabase) {
+          setError('Serviço de autenticação não configurado');
+          return;
+        }
+
         // O Supabase automaticamente estabelece a sessão quando o usuário
         // clica no link de recuperação de senha do email
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();

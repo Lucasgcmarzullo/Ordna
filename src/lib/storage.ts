@@ -32,6 +32,7 @@ export const addTask = (title: string, category: string): Task => {
     title,
     completed: false,
     category: category as 'trabalho' | 'estudos' | 'saude' | 'pessoal',
+    priority: 'medium',
     createdAt: new Date().toISOString(),
   };
   saveTasks([...tasks, newTask]);

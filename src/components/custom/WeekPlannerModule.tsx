@@ -49,9 +49,9 @@ export default function WeekPlannerModule() {
 
   const categories = [
     { id: 'work' as const, label: 'Trabalho', color: 'bg-blue-500', icon: Briefcase },
-    { id: 'study' as const, label: 'Estudos', color: 'bg-purple-500', icon: BookOpen },
-    { id: 'health' as const, label: 'Saúde', color: 'bg-green-500', icon: Heart },
-    { id: 'personal' as const, label: 'Pessoal', color: 'bg-orange-500', icon: User },
+    { id: 'study' as const, label: 'Estudos', color: 'bg-blue-500', icon: BookOpen },
+    { id: 'health' as const, label: 'Saúde', color: 'bg-blue-500', icon: Heart },
+    { id: 'personal' as const, label: 'Pessoal', color: 'bg-blue-500', icon: User },
   ];
 
   const days = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
@@ -241,10 +241,10 @@ export default function WeekPlannerModule() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2">
+        <h2 className="text-3xl font-bold text-black mb-2">
           Planejamento Semanal Inteligente
         </h2>
-        <p className="text-gray-600 dark:text-gray-400">
+        <p className="text-black">
           Descreva suas atividades e a IA criará um cronograma personalizado
         </p>
       </div>
@@ -289,17 +289,17 @@ export default function WeekPlannerModule() {
       )}
 
       <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
-        <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4 flex items-center gap-2">
-          <Sparkles className="w-5 h-5 text-purple-500" />
+        <h3 className="text-xl font-bold text-blue-600 dark:text-blue-400 mb-4 flex items-center gap-2">
+          <Sparkles className="w-5 h-5 text-blue-500" />
           Adicionar Atividades
         </h3>
         
         <div className="space-y-4">
-          <div className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg border border-purple-200 dark:border-purple-800">
-            <p className="text-sm font-semibold text-purple-800 dark:text-purple-300 mb-2">
+          <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
+            <p className="text-sm font-semibold text-blue-800 dark:text-blue-300 mb-2">
               💡 Exemplos de como usar:
             </p>
-            <ul className="text-sm text-purple-700 dark:text-purple-400 space-y-1">
+            <ul className="text-sm text-blue-700 dark:text-blue-400 space-y-1">
               <li>• &quot;Estudar 2 horas por dia&quot; → Todos os dias</li>
               <li>• &quot;Ir ao médico na segunda-feira&quot; → Apenas segunda</li>
               <li>• &quot;Trabalhar com marketing&quot; → Todos os dias</li>
@@ -331,7 +331,7 @@ export default function WeekPlannerModule() {
             
             <button
               onClick={addGoal}
-              className="px-6 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-all flex items-center justify-center gap-2"
+              className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all flex items-center justify-center gap-2"
             >
               <Plus className="w-5 h-5" />
               <span className="hidden sm:inline">Adicionar</span>
@@ -340,7 +340,7 @@ export default function WeekPlannerModule() {
 
           {goals.length > 0 && (
             <div className="space-y-2">
-              <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+              <p className="text-sm font-semibold text-blue-700 dark:text-blue-300">
                 Atividades adicionadas ({goals.length}):
               </p>
               {goals.map(goal => {
@@ -381,7 +381,7 @@ export default function WeekPlannerModule() {
           <button
             onClick={generateSchedule}
             disabled={goals.length === 0 || isGenerating}
-            className="w-full py-3 bg-gradient-to-r from-purple-500 to-blue-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full py-3 bg-gradient-to-r from-blue-500 to-cyan-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {isGenerating ? (
               <>
@@ -460,7 +460,7 @@ export default function WeekPlannerModule() {
               
               return (
                 <div key={day} className="space-y-2">
-                  <h4 className="font-bold text-gray-800 dark:text-gray-100 pb-2 border-b-2 border-purple-300 dark:border-purple-700">
+                  <h4 className="font-bold text-gray-800 dark:text-gray-100 pb-2 border-b-2 border-blue-300 dark:border-blue-700">
                     {day}
                   </h4>
                   {daySchedule.map(item => (

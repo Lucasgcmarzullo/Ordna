@@ -5,7 +5,7 @@ export interface Task {
   title: string;
   completed: boolean;
   category: 'trabalho' | 'estudos' | 'saude' | 'pessoal';
-  priority?: 'low' | 'medium' | 'high';
+  priority: 'low' | 'medium' | 'high';
   dueDate?: string;
   description?: string;
   createdAt: string;
@@ -68,7 +68,7 @@ export interface Goal {
 export interface Reminder {
   id: string;
   title: string;
-  date: string;
+  date?: string;
   time?: string;
   createdAt: string;
 }

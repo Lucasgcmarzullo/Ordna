@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Odrna - Organização Pessoal",
+  title: "ORDNA - Organização Pessoal",
   description: "Seu app completo de organização pessoal com tarefas, calendário e finanças",
 };
 

@@ -3,26 +3,25 @@
 import { useState, useEffect } from 'react';
 import { Plus, Trash2, Edit2, TrendingUp, TrendingDown, DollarSign, Crown, AlertCircle } from 'lucide-react';
 import { Transaction, FREE_PLAN_LIMITS } from '@/lib/types';
-import { getTransactions, saveTransactions, getSubscription } from '@/lib/storage';
+import { getTransactions, saveTransactions } from '@/lib/storage';
+import { useUser } from '@/contexts/UserContext';
 
 export default function FinanceModule() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [isPremium, setIsPremium] = useState(false);
   const [showLimitWarning, setShowLimitWarning] = useState(false);
+  const { isPremium } = useUser();
   const [formData, setFormData] = useState({
-    title: '',
+    description: '',
     amount: '',
     type: 'expense' as 'income' | 'expense',
-    category: '',
+    category: '' as 'alimentacao' | 'transporte' | 'saude' | 'lazer' | 'salario' | 'outros' | '',
     date: new Date().toISOString().split('T')[0],
   });
 
   useEffect(() => {
     setTransactions(getTransactions());
-    const subscription = getSubscription();
-    setIsPremium(subscription.isPremium);
   }, []);
 
   const canAddTransaction = () => {
@@ -40,12 +39,12 @@ export default function FinanceModule() {
   };
 
   const handleSave = () => {
-    if (!formData.title.trim() || !formData.amount || !formData.category) return;
+    if (!formData.description.trim() || !formData.amount || !formData.category) return;
 
     if (editingId) {
       const updated = transactions.map(transaction =>
         transaction.id === editingId
-          ? { ...transaction, ...formData, amount: parseFloat(formData.amount) }
+          ? { ...transaction, description: formData.description, amount: parseFloat(formData.amount), type: formData.type, category: formData.category as 'alimentacao' | 'transporte' | 'saude' | 'lazer' | 'salario' | 'outros', date: formData.date }
           : transaction
       );
       setTransactions(updated);
@@ -60,10 +59,10 @@ export default function FinanceModule() {
 
       const newTransaction: Transaction = {
         id: Date.now().toString(),
-        title: formData.title,
+        description: formData.description,
         amount: parseFloat(formData.amount),
         type: formData.type,
-        category: formData.category,
+        category: formData.category as 'alimentacao' | 'transporte' | 'saude' | 'lazer' | 'salario' | 'outros',
         date: formData.date,
         createdAt: new Date().toISOString(),
       };
@@ -74,7 +73,7 @@ export default function FinanceModule() {
     }
 
     setFormData({
-      title: '',
+      description: '',
       amount: '',
       type: 'expense',
       category: '',
@@ -85,7 +84,7 @@ export default function FinanceModule() {
   const handleEdit = (transaction: Transaction) => {
     setEditingId(transaction.id);
     setFormData({
-      title: transaction.title,
+      description: transaction.description,
       amount: transaction.amount.toString(),
       type: transaction.type,
       category: transaction.category,
@@ -109,17 +108,14 @@ export default function FinanceModule() {
 
   const balance = totalIncome - totalExpense;
 
-  const categories = [
-    'Alimentação',
-    'Transporte',
-    'Moradia',
-    'Saúde',
-    'Educação',
-    'Lazer',
-    'Salário',
-    'Investimentos',
-    'Outros',
-  ];
+  const categoryLabels: Record<'alimentacao' | 'transporte' | 'saude' | 'lazer' | 'salario' | 'outros', string> = {
+    alimentacao: 'Alimentação',
+    transporte: 'Transporte',
+    saude: 'Saúde',
+    lazer: 'Lazer',
+    salario: 'Salário',
+    outros: 'Outros',
+  };
 
   return (
     <div className="space-y-4">
@@ -134,7 +130,7 @@ export default function FinanceModule() {
         </div>
         <button
           onClick={handleAddClick}
-          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-blue-600 text-white rounded-lg hover:shadow-lg transition-all duration-300"
+          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-600 text-white rounded-lg hover:shadow-lg transition-all duration-300"
         >
           <Plus className="w-4 h-4" />
           Nova Transação
@@ -216,8 +212,8 @@ export default function FinanceModule() {
           <input
             type="text"
             placeholder="Descrição"
-            value={formData.title}
-            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+            value={formData.description}
+            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
             className="w-full px-4 py-2 mb-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
           />
 
@@ -232,15 +228,16 @@ export default function FinanceModule() {
             />
             <select
               value={formData.category}
-              onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+              onChange={(e) => setFormData({ ...formData, category: e.target.value as any })}
               className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
             >
               <option value="">Selecione categoria</option>
-              {categories.map((cat) => (
-                <option key={cat} value={cat}>
-                  {cat}
-                </option>
-              ))}
+              <option value="alimentacao">Alimentação</option>
+              <option value="transporte">Transporte</option>
+              <option value="saude">Saúde</option>
+              <option value="lazer">Lazer</option>
+              <option value="salario">Salário</option>
+              <option value="outros">Outros</option>
             </select>
             <input
               type="date"
@@ -253,7 +250,7 @@ export default function FinanceModule() {
           <div className="flex gap-2">
             <button
               onClick={handleSave}
-              className="flex-1 px-4 py-2 bg-gradient-to-r from-purple-500 to-blue-600 text-white rounded-lg hover:shadow-lg transition-all"
+              className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-600 text-white rounded-lg hover:shadow-lg transition-all"
             >
               Salvar
             </button>
@@ -262,7 +259,7 @@ export default function FinanceModule() {
                 setIsAdding(false);
                 setEditingId(null);
                 setFormData({
-                  title: '',
+                  description: '',
                   amount: '',
                   type: 'expense',
                   category: '',
@@ -298,10 +295,10 @@ export default function FinanceModule() {
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
                       <h4 className="font-semibold text-gray-900 dark:text-gray-100">
-                        {transaction.title}
+                        {transaction.description}
                       </h4>
                       <span className="text-xs px-2 py-1 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400">
-                        {transaction.category}
+                        {categoryLabels[transaction.category]}
                       </span>
                     </div>
                     <div className="flex items-center gap-3 mt-2">

@@ -3,25 +3,25 @@
 import { useState, useEffect } from 'react';
 import { Plus, Check, Trash2, Edit2, X, Crown, AlertCircle } from 'lucide-react';
 import { Task, FREE_PLAN_LIMITS } from '@/lib/types';
-import { getTasks, saveTasks, getSubscription } from '@/lib/storage';
+import { getTasks, saveTasks } from '@/lib/storage';
+import { useUser } from '@/contexts/UserContext';
 
 export default function TasksModule() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [isPremium, setIsPremium] = useState(false);
   const [showLimitWarning, setShowLimitWarning] = useState(false);
+  const { isPremium } = useUser();
   const [formData, setFormData] = useState({
     title: '',
     description: '',
+    category: 'pessoal' as 'trabalho' | 'estudos' | 'saude' | 'pessoal',
     priority: 'medium' as 'low' | 'medium' | 'high',
     dueDate: '',
   });
 
   useEffect(() => {
     setTasks(getTasks());
-    const subscription = getSubscription();
-    setIsPremium(subscription.isPremium);
   }, []);
 
   const canAddTask = () => {
@@ -69,7 +69,7 @@ export default function TasksModule() {
       setIsAdding(false);
     }
 
-    setFormData({ title: '', description: '', priority: 'medium', dueDate: '' });
+    setFormData({ title: '', description: '', category: 'pessoal', priority: 'medium', dueDate: '' });
   };
 
   const handleEdit = (task: Task) => {
@@ -77,6 +77,7 @@ export default function TasksModule() {
     setFormData({
       title: task.title,
       description: task.description || '',
+      category: task.category,
       priority: task.priority,
       dueDate: task.dueDate || '',
     });
@@ -115,7 +116,7 @@ export default function TasksModule() {
         </div>
         <button
           onClick={handleAddClick}
-          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-blue-600 text-white rounded-lg hover:shadow-lg transition-all duration-300"
+          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-600 text-white rounded-lg hover:shadow-lg transition-all duration-300"
         >
           <Plus className="w-4 h-4" />
           Nova Tarefa
@@ -155,6 +156,16 @@ export default function TasksModule() {
           />
           <div className="flex flex-col sm:flex-row gap-3 mb-3">
             <select
+              value={formData.category}
+              onChange={(e) => setFormData({ ...formData, category: e.target.value as 'trabalho' | 'estudos' | 'saude' | 'pessoal' })}
+              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+            >
+              <option value="pessoal">Pessoal</option>
+              <option value="trabalho">Trabalho</option>
+              <option value="estudos">Estudos</option>
+              <option value="saude">Saúde</option>
+            </select>
+            <select
               value={formData.priority}
               onChange={(e) => setFormData({ ...formData, priority: e.target.value as any })}
               className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
@@ -173,7 +184,7 @@ export default function TasksModule() {
           <div className="flex gap-2">
             <button
               onClick={handleSave}
-              className="flex-1 px-4 py-2 bg-gradient-to-r from-purple-500 to-blue-600 text-white rounded-lg hover:shadow-lg transition-all"
+              className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-600 text-white rounded-lg hover:shadow-lg transition-all"
             >
               Salvar
             </button>
@@ -181,7 +192,7 @@ export default function TasksModule() {
               onClick={() => {
                 setIsAdding(false);
                 setEditingId(null);
-                setFormData({ title: '', description: '', priority: 'medium', dueDate: '' });
+                setFormData({ title: '', description: '', category: 'pessoal', priority: 'medium', dueDate: '' });
               }}
               className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-all"
             >
@@ -209,7 +220,7 @@ export default function TasksModule() {
                   onClick={() => handleToggle(task.id)}
                   className={`mt-1 w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
                     task.completed
-                      ? 'bg-gradient-to-r from-purple-500 to-blue-600 border-transparent'
+                      ? 'bg-gradient-to-r from-blue-500 to-cyan-600 border-transparent'
                       : 'border-gray-300 dark:border-gray-600'
                   }`}
                 >

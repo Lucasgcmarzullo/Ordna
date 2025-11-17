@@ -223,7 +223,7 @@ export default function AIAssistantModule() {
       create: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
       update: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
       delete: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
-      list: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
+      list: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
     };
 
     const Icon = icons[action.type];
@@ -255,7 +255,7 @@ export default function AIAssistantModule() {
   return (
     <div className="h-[calc(100vh-8rem)] flex flex-col bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
       {/* Header */}
-      <div className="bg-gradient-to-r from-purple-500 to-blue-600 p-6 rounded-t-xl">
+      <div className="bg-gradient-to-r from-blue-500 to-cyan-600 p-6 rounded-t-xl">
         <div className="flex items-center gap-3">
           <div className="bg-white/20 p-3 rounded-lg">
             <Sparkles className="w-6 h-6 text-white" />
@@ -277,7 +277,7 @@ export default function AIAssistantModule() {
             <div
               className={`max-w-[80%] rounded-2xl p-4 ${
                 message.role === 'user'
-                  ? 'bg-gradient-to-r from-purple-500 to-blue-600 text-white'
+                  ? 'bg-gradient-to-r from-blue-500 to-cyan-600 text-white'
                   : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-100'
               }`}
             >
@@ -307,7 +307,7 @@ export default function AIAssistantModule() {
         {isLoading && (
           <div className="flex justify-start">
             <div className="bg-gray-100 dark:bg-gray-700 rounded-2xl p-4">
-              <Loader2 className="w-5 h-5 animate-spin text-purple-500" />
+              <Loader2 className="w-5 h-5 animate-spin text-blue-500" />
             </div>
           </div>
         )}
@@ -324,13 +324,13 @@ export default function AIAssistantModule() {
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleSend()}
             placeholder="Digite seu comando... (ex: crie uma tarefa de estudar)"
-            className="flex-1 px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
+            className="flex-1 px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
             disabled={isLoading}
           />
           <button
             onClick={handleSend}
             disabled={isLoading || !input.trim()}
-            className="px-6 py-3 bg-gradient-to-r from-purple-500 to-blue-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? (
               <Loader2 className="w-5 h-5 animate-spin" />

@@ -257,14 +257,14 @@ export default function AuthPage() {
   // Modal de Esqueceu a Senha
   if (showForgotPassword) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-purple-500 via-blue-600 to-indigo-700">
+      <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-blue-500 via-cyan-600 to-blue-700">
         <div className="w-full max-w-md">
           {/* Logo e Header */}
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center w-24 h-24 bg-white rounded-2xl shadow-2xl mb-4">
               <img 
-                src="https://k6hrqrxuu8obbfwn.public.blob.vercel-storage.com/temp/9179d525-92d6-4d5f-a6ee-6acb92a0dc66.png" 
-                alt="Odrna Logo" 
+                src="https://k6hrqrxuu8obbfwn.public.blob.vercel-storage.com/temp/dc950168-8616-4b25-98ec-a492901ea4ee.jpg" 
+                alt="ORDNA Logo" 
                 className="w-20 h-20 object-contain"
               />
             </div>
@@ -285,7 +285,7 @@ export default function AuthPage() {
                     type="email"
                     value={resetEmail}
                     onChange={(e) => setResetEmail(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                     placeholder="seu@email.com"
                   />
                 </div>
@@ -306,7 +306,7 @@ export default function AuthPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-gradient-to-r from-purple-500 to-blue-600 text-white py-3 rounded-lg font-semibold hover:shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-gradient-to-r from-blue-500 to-cyan-600 text-white py-3 rounded-lg font-semibold hover:shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <span>Enviando...</span>
@@ -338,18 +338,18 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-purple-500 via-blue-600 to-indigo-700">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-blue-500 via-cyan-600 to-blue-700">
       <div className="w-full max-w-md">
         {/* Logo e Header */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-24 h-24 bg-white rounded-2xl shadow-2xl mb-4">
             <img 
-              src="https://k6hrqrxuu8obbfwn.public.blob.vercel-storage.com/temp/9179d525-92d6-4d5f-a6ee-6acb92a0dc66.png" 
-              alt="Odrna Logo" 
+              src="https://k6hrqrxuu8obbfwn.public.blob.vercel-storage.com/temp/dc950168-8616-4b25-98ec-a492901ea4ee.jpg" 
+              alt="ORDNA Logo" 
               className="w-20 h-20 object-contain"
             />
           </div>
-          <h1 className="text-4xl font-bold text-white mb-2">Odrna</h1>
+          <h1 className="text-4xl font-bold text-white mb-2">ORDNA</h1>
           <p className="text-white/80">Organize sua vida de forma simples</p>
         </div>
 
@@ -364,7 +364,7 @@ export default function AuthPage() {
               }}
               className={`flex-1 py-2 rounded-lg font-semibold transition-all ${
                 isLogin
-                  ? 'bg-white text-purple-600 shadow-md'
+                  ? 'bg-white text-blue-600 shadow-md'
                   : 'text-gray-600 hover:text-gray-800'
               }`}
             >
@@ -377,7 +377,7 @@ export default function AuthPage() {
               }}
               className={`flex-1 py-2 rounded-lg font-semibold transition-all ${
                 !isLogin
-                  ? 'bg-white text-purple-600 shadow-md'
+                  ? 'bg-white text-blue-600 shadow-md'
                   : 'text-gray-600 hover:text-gray-800'
               }`}
             >
@@ -398,7 +398,7 @@ export default function AuthPage() {
                     type="text"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                     placeholder="Seu nome"
                   />
                 </div>
@@ -415,7 +415,7 @@ export default function AuthPage() {
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                   placeholder="seu@email.com"
                 />
               </div>
@@ -431,7 +431,7 @@ export default function AuthPage() {
                   type={showPassword ? 'text' : 'password'}
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                  className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                   placeholder="••••••••"
                 />
                 <button
@@ -452,7 +452,7 @@ export default function AuthPage() {
                   <button
                     type="button"
                     onClick={() => setShowForgotPassword(true)}
-                    className="text-xs text-purple-600 hover:text-purple-700 font-medium transition-colors"
+                    className="text-xs text-blue-600 hover:text-blue-700 font-medium transition-colors"
                   >
                     Esqueceu a senha?
                   </button>
@@ -469,7 +469,7 @@ export default function AuthPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-purple-500 to-blue-600 text-white py-3 rounded-lg font-semibold hover:shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-gradient-to-r from-blue-500 to-cyan-600 text-white py-3 rounded-lg font-semibold hover:shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? (
                 <span>Carregando...</span>
@@ -492,7 +492,7 @@ export default function AuthPage() {
                     setIsLogin(false);
                     setError('');
                   }}
-                  className="text-purple-600 font-semibold hover:underline"
+                  className="text-blue-600 font-semibold hover:underline"
                 >
                   Cadastre-se grátis
                 </button>
@@ -505,7 +505,7 @@ export default function AuthPage() {
                     setIsLogin(true);
                     setError('');
                   }}
-                  className="text-purple-600 font-semibold hover:underline"
+                  className="text-blue-600 font-semibold hover:underline"
                 >
                   Faça login
                 </button>

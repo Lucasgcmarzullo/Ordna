@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import { Plus, Trash2, Edit2, ChevronLeft, ChevronRight, Crown, AlertCircle } from 'lucide-react';
 import { CalendarEvent, FREE_PLAN_LIMITS } from '@/lib/types';
-import { getEvents, saveEvents, getSubscription } from '@/lib/storage';
+import { getEvents, saveEvents } from '@/lib/storage';
+import { useUser } from '@/contexts/UserContext';
 
 export default function CalendarModule() {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
@@ -11,20 +12,19 @@ export default function CalendarModule() {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [isPremium, setIsPremium] = useState(false);
   const [showLimitWarning, setShowLimitWarning] = useState(false);
+  const { isPremium } = useUser();
   const [formData, setFormData] = useState({
     title: '',
     description: '',
     date: '',
     time: '',
     color: '#8B5CF6',
+    category: 'pessoal' as 'trabalho' | 'estudos' | 'saude' | 'pessoal',
   });
 
   useEffect(() => {
     setEvents(getEvents());
-    const subscription = getSubscription();
-    setIsPremium(subscription.isPremium);
   }, []);
 
   const canAddEvent = () => {
@@ -69,7 +69,7 @@ export default function CalendarModule() {
       setIsAdding(false);
     }
 
-    setFormData({ title: '', description: '', date: '', time: '', color: '#8B5CF6' });
+    setFormData({ title: '', description: '', date: '', time: '', color: '#8B5CF6', category: 'pessoal' });
   };
 
   const handleEdit = (event: CalendarEvent) => {
@@ -79,7 +79,8 @@ export default function CalendarModule() {
       description: event.description || '',
       date: event.date,
       time: event.time || '',
-      color: event.color,
+      color: event.color || '#8B5CF6',
+      category: event.category,
     });
   };
 
@@ -120,6 +121,13 @@ export default function CalendarModule() {
     setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1));
   };
 
+  const categoryLabels = {
+    trabalho: 'Trabalho',
+    estudos: 'Estudos',
+    saude: 'Saúde',
+    pessoal: 'Pessoal'
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -133,7 +141,7 @@ export default function CalendarModule() {
         </div>
         <button
           onClick={handleAddClick}
-          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-blue-600 text-white rounded-lg hover:shadow-lg transition-all duration-300"
+          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-600 text-white rounded-lg hover:shadow-lg transition-all duration-300"
         >
           <Plus className="w-4 h-4" />
           Novo Evento
@@ -171,6 +179,16 @@ export default function CalendarModule() {
             className="w-full px-4 py-2 mb-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 resize-none"
             rows={2}
           />
+          <select
+            value={formData.category}
+            onChange={(e) => setFormData({ ...formData, category: e.target.value as 'trabalho' | 'estudos' | 'saude' | 'pessoal' })}
+            className="w-full px-4 py-2 mb-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+          >
+            <option value="pessoal">Pessoal</option>
+            <option value="trabalho">Trabalho</option>
+            <option value="estudos">Estudos</option>
+            <option value="saude">Saúde</option>
+          </select>
           <div className="flex flex-col sm:flex-row gap-3 mb-3">
             <input
               type="date"
@@ -194,7 +212,7 @@ export default function CalendarModule() {
           <div className="flex gap-2">
             <button
               onClick={handleSave}
-              className="flex-1 px-4 py-2 bg-gradient-to-r from-purple-500 to-blue-600 text-white rounded-lg hover:shadow-lg transition-all"
+              className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-600 text-white rounded-lg hover:shadow-lg transition-all"
             >
               Salvar
             </button>
@@ -202,7 +220,7 @@ export default function CalendarModule() {
               onClick={() => {
                 setIsAdding(false);
                 setEditingId(null);
-                setFormData({ title: '', description: '', date: '', time: '', color: '#8B5CF6' });
+                setFormData({ title: '', description: '', date: '', time: '', color: '#8B5CF6', category: 'pessoal' });
               }}
               className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-all"
             >
@@ -295,7 +313,12 @@ export default function CalendarModule() {
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
-                    <h4 className="font-semibold text-gray-900 dark:text-gray-100">{event.title}</h4>
+                    <div className="flex items-center gap-2">
+                      <h4 className="font-semibold text-gray-900 dark:text-gray-100">{event.title}</h4>
+                      <span className="text-xs px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded">
+                        {categoryLabels[event.category]}
+                      </span>
+                    </div>
                     {event.description && (
                       <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{event.description}</p>
                     )}

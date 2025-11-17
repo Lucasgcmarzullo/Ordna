@@ -26,9 +26,7 @@ export async function processUserIntent(userInput: string): Promise<AIResponse> 
       id: Date.now().toString(),
       title: 'Meta de Estudos',
       description: 'Melhorar hábitos de estudo e aprendizado contínuo',
-      targetDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      progress: 0,
-      tasks: [],
+      completed: false,
       createdAt: new Date().toISOString(),
     };
 
@@ -38,6 +36,7 @@ export async function processUserIntent(userInput: string): Promise<AIResponse> 
         title: 'Definir horário fixo de estudos',
         description: 'Escolher 2 horas por dia para estudar',
         completed: false,
+        category: 'estudos',
         priority: 'high',
         dueDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
         createdAt: new Date().toISOString(),
@@ -47,6 +46,7 @@ export async function processUserIntent(userInput: string): Promise<AIResponse> 
         title: 'Criar lista de tópicos para estudar',
         description: 'Organizar conteúdos por prioridade',
         completed: false,
+        category: 'estudos',
         priority: 'high',
         dueDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
         createdAt: new Date().toISOString(),
@@ -56,6 +56,7 @@ export async function processUserIntent(userInput: string): Promise<AIResponse> 
         title: 'Estudar 30 minutos por dia',
         description: 'Começar com sessões curtas e aumentar gradualmente',
         completed: false,
+        category: 'estudos',
         priority: 'medium',
         dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
         createdAt: new Date().toISOString(),
@@ -66,24 +67,17 @@ export async function processUserIntent(userInput: string): Promise<AIResponse> 
       {
         id: `${Date.now()}-r1`,
         title: 'Hora de estudar! 📚',
-        description: 'Lembre-se de dedicar tempo aos estudos',
         time: '19:00',
-        frequency: 'daily',
-        active: true,
         createdAt: new Date().toISOString(),
       },
       {
         id: `${Date.now()}-r2`,
         title: 'Revisar progresso semanal',
-        description: 'Verificar o que foi estudado esta semana',
         time: '18:00',
-        frequency: 'weekly',
-        active: true,
         createdAt: new Date().toISOString(),
       },
     ];
 
-    goal.tasks = tasks.map(t => t.id);
     response.goals.push(goal);
     response.tasks.push(...tasks);
     response.reminders.push(...reminders);
@@ -96,9 +90,7 @@ export async function processUserIntent(userInput: string): Promise<AIResponse> 
       id: Date.now().toString(),
       title: 'Meta de Exercícios',
       description: 'Criar rotina de exercícios físicos',
-      targetDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      progress: 0,
-      tasks: [],
+      completed: false,
       createdAt: new Date().toISOString(),
     };
 
@@ -108,6 +100,7 @@ export async function processUserIntent(userInput: string): Promise<AIResponse> 
         title: 'Escolher tipo de exercício',
         description: 'Decidir entre academia, corrida, yoga, etc.',
         completed: false,
+        category: 'saude',
         priority: 'high',
         dueDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
         createdAt: new Date().toISOString(),
@@ -117,6 +110,7 @@ export async function processUserIntent(userInput: string): Promise<AIResponse> 
         title: 'Exercitar 3x por semana',
         description: 'Começar com 30 minutos por sessão',
         completed: false,
+        category: 'saude',
         priority: 'high',
         dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
         createdAt: new Date().toISOString(),
@@ -127,15 +121,11 @@ export async function processUserIntent(userInput: string): Promise<AIResponse> 
       {
         id: `${Date.now()}-r1`,
         title: 'Hora do treino! 💪',
-        description: 'Não esqueça de se exercitar hoje',
         time: '07:00',
-        frequency: 'daily',
-        active: true,
         createdAt: new Date().toISOString(),
       },
     ];
 
-    goal.tasks = tasks.map(t => t.id);
     response.goals.push(goal);
     response.tasks.push(...tasks);
     response.reminders.push(...reminders);
@@ -148,9 +138,7 @@ export async function processUserIntent(userInput: string): Promise<AIResponse> 
       id: Date.now().toString(),
       title: 'Meta de Economia',
       description: 'Melhorar controle financeiro e poupar dinheiro',
-      targetDate: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      progress: 0,
-      tasks: [],
+      completed: false,
       createdAt: new Date().toISOString(),
     };
 
@@ -160,6 +148,7 @@ export async function processUserIntent(userInput: string): Promise<AIResponse> 
         title: 'Analisar gastos mensais',
         description: 'Revisar todas as despesas do último mês',
         completed: false,
+        category: 'pessoal',
         priority: 'high',
         dueDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
         createdAt: new Date().toISOString(),
@@ -169,6 +158,7 @@ export async function processUserIntent(userInput: string): Promise<AIResponse> 
         title: 'Definir meta de economia mensal',
         description: 'Estabelecer quanto guardar por mês',
         completed: false,
+        category: 'pessoal',
         priority: 'high',
         dueDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
         createdAt: new Date().toISOString(),
@@ -178,6 +168,7 @@ export async function processUserIntent(userInput: string): Promise<AIResponse> 
         title: 'Cortar gastos desnecessários',
         description: 'Identificar e eliminar despesas supérfluas',
         completed: false,
+        category: 'pessoal',
         priority: 'medium',
         dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
         createdAt: new Date().toISOString(),
@@ -188,15 +179,11 @@ export async function processUserIntent(userInput: string): Promise<AIResponse> 
       {
         id: `${Date.now()}-r1`,
         title: 'Registrar gastos do dia 💰',
-        description: 'Anote todas as despesas de hoje',
         time: '21:00',
-        frequency: 'daily',
-        active: true,
         createdAt: new Date().toISOString(),
       },
     ];
 
-    goal.tasks = tasks.map(t => t.id);
     response.goals.push(goal);
     response.tasks.push(...tasks);
     response.reminders.push(...reminders);
