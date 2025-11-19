@@ -1,6 +1,14 @@
-// LocalStorage helpers for Odrna
+// LocalStorage helpers for Odrna com sincronização automática Supabase
 
 import { Task, CalendarEvent, Transaction, Goal, Reminder, AIInsight, PremiumWidget, UserSubscription } from './types';
+import { 
+  syncTasksToSupabase, 
+  syncEventsToSupabase, 
+  syncTransactionsToSupabase,
+  loadTasksFromSupabase,
+  loadEventsFromSupabase,
+  loadTransactionsFromSupabase
+} from './supabase-sync';
 
 const STORAGE_KEYS = {
   TASKS: 'odrna_tasks',
@@ -13,7 +21,23 @@ const STORAGE_KEYS = {
   SUBSCRIPTION: 'odrna_subscription',
 } as const;
 
-// Tasks
+// Helper para obter userId do localStorage
+const getCurrentUserId = (): string | null => {
+  if (typeof window === 'undefined') return null;
+  const user = localStorage.getItem('odrna_current_user');
+  if (!user) return null;
+  try {
+    const userData = JSON.parse(user);
+    return userData.id || null;
+  } catch {
+    return null;
+  }
+};
+
+// ===========================
+// TASKS
+// ===========================
+
 export const getTasks = (): Task[] => {
   if (typeof window === 'undefined') return [];
   const data = localStorage.getItem(STORAGE_KEYS.TASKS);
@@ -23,6 +47,14 @@ export const getTasks = (): Task[] => {
 export const saveTasks = (tasks: Task[]): void => {
   if (typeof window === 'undefined') return;
   localStorage.setItem(STORAGE_KEYS.TASKS, JSON.stringify(tasks));
+  
+  // Sincronizar com Supabase automaticamente
+  const userId = getCurrentUserId();
+  if (userId) {
+    syncTasksToSupabase(userId, tasks).catch(err => 
+      console.error('Erro ao sincronizar tarefas:', err)
+    );
+  }
 };
 
 export const addTask = (title: string, category: string): Task => {
@@ -53,7 +85,26 @@ export const deleteTask = (id: string): void => {
   saveTasks(filteredTasks);
 };
 
-// Calendar Events
+// Carregar tarefas do Supabase
+export const loadTasksFromCloud = async (): Promise<void> => {
+  const userId = getCurrentUserId();
+  if (!userId) return;
+  
+  try {
+    const cloudTasks = await loadTasksFromSupabase(userId);
+    if (cloudTasks.length > 0) {
+      localStorage.setItem(STORAGE_KEYS.TASKS, JSON.stringify(cloudTasks));
+      console.log('✅ Tarefas carregadas da nuvem!');
+    }
+  } catch (error) {
+    console.error('❌ Erro ao carregar tarefas da nuvem:', error);
+  }
+};
+
+// ===========================
+// CALENDAR EVENTS
+// ===========================
+
 export const getEvents = (): CalendarEvent[] => {
   if (typeof window === 'undefined') return [];
   const data = localStorage.getItem(STORAGE_KEYS.EVENTS);
@@ -63,6 +114,14 @@ export const getEvents = (): CalendarEvent[] => {
 export const saveEvents = (events: CalendarEvent[]): void => {
   if (typeof window === 'undefined') return;
   localStorage.setItem(STORAGE_KEYS.EVENTS, JSON.stringify(events));
+  
+  // Sincronizar com Supabase automaticamente
+  const userId = getCurrentUserId();
+  if (userId) {
+    syncEventsToSupabase(userId, events).catch(err => 
+      console.error('Erro ao sincronizar eventos:', err)
+    );
+  }
 };
 
 export const addEvent = (title: string, date: string, category: string): CalendarEvent => {
@@ -92,7 +151,26 @@ export const deleteEvent = (id: string): void => {
   saveEvents(filteredEvents);
 };
 
-// Transactions
+// Carregar eventos do Supabase
+export const loadEventsFromCloud = async (): Promise<void> => {
+  const userId = getCurrentUserId();
+  if (!userId) return;
+  
+  try {
+    const cloudEvents = await loadEventsFromSupabase(userId);
+    if (cloudEvents.length > 0) {
+      localStorage.setItem(STORAGE_KEYS.EVENTS, JSON.stringify(cloudEvents));
+      console.log('✅ Eventos carregados da nuvem!');
+    }
+  } catch (error) {
+    console.error('❌ Erro ao carregar eventos da nuvem:', error);
+  }
+};
+
+// ===========================
+// TRANSACTIONS
+// ===========================
+
 export const getTransactions = (): Transaction[] => {
   if (typeof window === 'undefined') return [];
   const data = localStorage.getItem(STORAGE_KEYS.TRANSACTIONS);
@@ -102,6 +180,14 @@ export const getTransactions = (): Transaction[] => {
 export const saveTransactions = (transactions: Transaction[]): void => {
   if (typeof window === 'undefined') return;
   localStorage.setItem(STORAGE_KEYS.TRANSACTIONS, JSON.stringify(transactions));
+  
+  // Sincronizar com Supabase automaticamente
+  const userId = getCurrentUserId();
+  if (userId) {
+    syncTransactionsToSupabase(userId, transactions).catch(err => 
+      console.error('Erro ao sincronizar transações:', err)
+    );
+  }
 };
 
 export const addTransaction = (
@@ -138,7 +224,40 @@ export const deleteTransaction = (id: string): void => {
   saveTransactions(filteredTransactions);
 };
 
-// Goals
+// Carregar transações do Supabase
+export const loadTransactionsFromCloud = async (): Promise<void> => {
+  const userId = getCurrentUserId();
+  if (!userId) return;
+  
+  try {
+    const cloudTransactions = await loadTransactionsFromSupabase(userId);
+    if (cloudTransactions.length > 0) {
+      localStorage.setItem(STORAGE_KEYS.TRANSACTIONS, JSON.stringify(cloudTransactions));
+      console.log('✅ Transações carregadas da nuvem!');
+    }
+  } catch (error) {
+    console.error('❌ Erro ao carregar transações da nuvem:', error);
+  }
+};
+
+// ===========================
+// SINCRONIZAÇÃO COMPLETA
+// ===========================
+
+export const syncAllDataWithCloud = async (): Promise<void> => {
+  console.log('🔄 Iniciando sincronização completa...');
+  await Promise.all([
+    loadTasksFromCloud(),
+    loadEventsFromCloud(),
+    loadTransactionsFromCloud()
+  ]);
+  console.log('✅ Sincronização completa finalizada!');
+};
+
+// ===========================
+// GOALS
+// ===========================
+
 export const getGoals = (): Goal[] => {
   if (typeof window === 'undefined') return [];
   const data = localStorage.getItem(STORAGE_KEYS.GOALS);
@@ -150,7 +269,10 @@ export const saveGoals = (goals: Goal[]): void => {
   localStorage.setItem(STORAGE_KEYS.GOALS, JSON.stringify(goals));
 };
 
-// Reminders
+// ===========================
+// REMINDERS
+// ===========================
+
 export const getReminders = (): Reminder[] => {
   if (typeof window === 'undefined') return [];
   const data = localStorage.getItem(STORAGE_KEYS.REMINDERS);
@@ -162,7 +284,10 @@ export const saveReminders = (reminders: Reminder[]): void => {
   localStorage.setItem(STORAGE_KEYS.REMINDERS, JSON.stringify(reminders));
 };
 
-// AI Insights
+// ===========================
+// AI INSIGHTS
+// ===========================
+
 export const getAIInsights = (): AIInsight[] => {
   if (typeof window === 'undefined') return [];
   const data = localStorage.getItem(STORAGE_KEYS.AI_INSIGHTS);
@@ -174,7 +299,10 @@ export const saveAIInsights = (insights: AIInsight[]): void => {
   localStorage.setItem(STORAGE_KEYS.AI_INSIGHTS, JSON.stringify(insights));
 };
 
-// Premium Widgets
+// ===========================
+// PREMIUM WIDGETS
+// ===========================
+
 export const getPremiumWidgets = (): PremiumWidget[] => {
   if (typeof window === 'undefined') return [];
   const data = localStorage.getItem(STORAGE_KEYS.PREMIUM_WIDGETS);
@@ -194,7 +322,10 @@ const getDefaultWidgets = (): PremiumWidget[] => [
   { id: '5', type: 'ai-insights', title: 'Insights de IA', enabled: true, position: 5 },
 ];
 
-// Subscription
+// ===========================
+// SUBSCRIPTION
+// ===========================
+
 export const getSubscription = (): UserSubscription => {
   if (typeof window === 'undefined') return { isPremium: false, planName: 'free' };
   const data = localStorage.getItem(STORAGE_KEYS.SUBSCRIPTION);

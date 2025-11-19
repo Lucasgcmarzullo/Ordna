@@ -1,10 +1,11 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Send, Sparkles, Loader2, CheckSquare, Calendar, DollarSign, Trash2, Edit } from 'lucide-react';
+import { Send, Sparkles, Loader2, CheckSquare, Calendar, DollarSign, Trash2, Edit, Crown, Check } from 'lucide-react';
 import { addTask, getTasks, updateTask, deleteTask } from '@/lib/storage';
 import { addEvent, getEvents, updateEvent, deleteEvent } from '@/lib/storage';
 import { addTransaction, getTransactions, updateTransaction, deleteTransaction } from '@/lib/storage';
+import { useUser } from '@/contexts/UserContext';
 
 interface Message {
   id: string;
@@ -21,6 +22,7 @@ interface ExecutedAction {
 }
 
 export default function AIAssistantModule() {
+  const { isPremium } = useUser();
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -253,118 +255,120 @@ export default function AIAssistantModule() {
   };
 
   return (
-    <div className="h-[calc(100vh-8rem)] flex flex-col bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-blue-500 to-cyan-600 p-6 rounded-t-xl">
-        <div className="flex items-center gap-3">
-          <div className="bg-white/20 p-3 rounded-lg">
-            <Sparkles className="w-6 h-6 text-white" />
-          </div>
-          <div>
-            <h2 className="text-2xl font-bold text-white">Assistente IA</h2>
-            <p className="text-white/80 text-sm">Controle tudo com comandos naturais</p>
+    <div className="space-y-6">
+      <div className="h-[calc(100vh-16rem)] flex flex-col bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-blue-500 to-cyan-600 p-6 rounded-t-xl">
+          <div className="flex items-center gap-3">
+            <div className="bg-white/20 p-3 rounded-lg">
+              <Sparkles className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold text-white">Assistente IA</h2>
+              <p className="text-white/80 text-sm">Controle tudo com comandos naturais</p>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-4">
-        {messages.map((message) => (
-          <div
-            key={message.id}
-            className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-          >
+        {/* Messages */}
+        <div className="flex-1 overflow-y-auto p-6 space-y-4">
+          {messages.map((message) => (
             <div
-              className={`max-w-[80%] rounded-2xl p-4 ${
-                message.role === 'user'
-                  ? 'bg-gradient-to-r from-blue-500 to-cyan-600 text-white'
-                  : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-100'
-              }`}
+              key={message.id}
+              className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
-              <p className="whitespace-pre-wrap">{message.content}</p>
-              
-              {message.actions && message.actions.length > 0 && (
-                <div className="mt-3 pt-3 border-t border-white/20 dark:border-gray-600 space-y-2">
-                  <p className="text-xs font-semibold opacity-80 mb-2">Ações executadas:</p>
-                  <div className="flex flex-wrap gap-2">
-                    {message.actions.map((action, idx) => (
-                      <div key={idx}>{renderActionBadge(action)}</div>
-                    ))}
+              <div
+                className={`max-w-[80%] rounded-2xl p-4 ${
+                  message.role === 'user'
+                    ? 'bg-gradient-to-r from-blue-500 to-cyan-600 text-white'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-100'
+                }`}
+              >
+                <p className="whitespace-pre-wrap">{message.content}</p>
+                
+                {message.actions && message.actions.length > 0 && (
+                  <div className="mt-3 pt-3 border-t border-white/20 dark:border-gray-600 space-y-2">
+                    <p className="text-xs font-semibold opacity-80 mb-2">Ações executadas:</p>
+                    <div className="flex flex-wrap gap-2">
+                      {message.actions.map((action, idx) => (
+                        <div key={idx}>{renderActionBadge(action)}</div>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )}
-              
-              <p className="text-xs opacity-70 mt-2">
-                {message.timestamp.toLocaleTimeString('pt-BR', {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })}
-              </p>
+                )}
+                
+                <p className="text-xs opacity-70 mt-2">
+                  {message.timestamp.toLocaleTimeString('pt-BR', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
+                </p>
+              </div>
             </div>
-          </div>
-        ))}
-        
-        {isLoading && (
-          <div className="flex justify-start">
-            <div className="bg-gray-100 dark:bg-gray-700 rounded-2xl p-4">
-              <Loader2 className="w-5 h-5 animate-spin text-blue-500" />
+          ))}
+          
+          {isLoading && (
+            <div className="flex justify-start">
+              <div className="bg-gray-100 dark:bg-gray-700 rounded-2xl p-4">
+                <Loader2 className="w-5 h-5 animate-spin text-blue-500" />
+              </div>
             </div>
-          </div>
-        )}
-        
-        <div ref={messagesEndRef} />
-      </div>
-
-      {/* Input */}
-      <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-        <div className="flex gap-2">
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-            placeholder="Digite seu comando... (ex: crie uma tarefa de estudar)"
-            className="flex-1 px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            disabled={isLoading}
-          />
-          <button
-            onClick={handleSend}
-            disabled={isLoading || !input.trim()}
-            className="px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isLoading ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
-            ) : (
-              <Send className="w-5 h-5" />
-            )}
-          </button>
+          )}
+          
+          <div ref={messagesEndRef} />
         </div>
-        
-        <div className="mt-3 flex flex-wrap gap-2">
-          <button
-            onClick={() => setInput('Crie 2 tarefas: estudar inglês e fazer exercícios')}
-            className="px-3 py-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-all"
-          >
-            Criar tarefas
-          </button>
-          <button
-            onClick={() => setInput('Adicione uma despesa de R$ 50 no mercado')}
-            className="px-3 py-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-all"
-          >
-            Registrar despesa
-          </button>
-          <button
-            onClick={() => setInput('Meu salário de R$ 1400 caiu')}
-            className="px-3 py-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-all"
-          >
-            Registrar receita
-          </button>
-          <button
-            onClick={() => setInput('Liste minhas tarefas pendentes')}
-            className="px-3 py-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-all"
-          >
-            Listar tarefas
-          </button>
+
+        {/* Input */}
+        <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleSend()}
+              placeholder="Digite seu comando... (ex: crie uma tarefa de estudar)"
+              className="flex-1 px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              disabled={isLoading}
+            />
+            <button
+              onClick={handleSend}
+              disabled={isLoading || !input.trim()}
+              className="px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isLoading ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                <Send className="w-5 h-5" />
+              )}
+            </button>
+          </div>
+          
+          <div className="mt-3 flex flex-wrap gap-2">
+            <button
+              onClick={() => setInput('Crie 2 tarefas: estudar inglês e fazer exercícios')}
+              className="px-3 py-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-all"
+            >
+              Criar tarefas
+            </button>
+            <button
+              onClick={() => setInput('Adicione uma despesa de R$ 50 no mercado')}
+              className="px-3 py-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-all"
+            >
+              Registrar despesa
+            </button>
+            <button
+              onClick={() => setInput('Meu salário de R$ 1400 caiu')}
+              className="px-3 py-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-all"
+            >
+              Registrar receita
+            </button>
+            <button
+              onClick={() => setInput('Liste minhas tarefas pendentes')}
+              className="px-3 py-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-all"
+            >
+              Listar tarefas
+            </button>
+          </div>
         </div>
       </div>
     </div>

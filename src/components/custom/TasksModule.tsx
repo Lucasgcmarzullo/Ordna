@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Plus, Check, Trash2, Edit2, X, Crown, AlertCircle } from 'lucide-react';
+import { Plus, Check, Trash2, Edit2, Crown, AlertCircle } from 'lucide-react';
 import { Task, FREE_PLAN_LIMITS } from '@/lib/types';
 import { getTasks, saveTasks } from '@/lib/storage';
 import { useUser } from '@/contexts/UserContext';

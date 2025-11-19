@@ -408,14 +408,14 @@ export default function WeekPlannerModule() {
             <div className="flex gap-2">
               <button
                 onClick={() => setShowSaveDialog(!showSaveDialog)}
-                className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-all flex items-center gap-2"
+                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all flex items-center gap-2"
               >
                 <Save className="w-4 h-4" />
                 Salvar
               </button>
               <button
                 onClick={exportPlanning}
-                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all flex items-center gap-2"
+                className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-all flex items-center gap-2"
               >
                 <Download className="w-4 h-4" />
                 Exportar

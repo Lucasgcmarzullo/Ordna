@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Mail, Lock, User, ArrowRight, Eye, EyeOff } from 'lucide-react';
-import { criar_usuario_supabase_auth } from '@/lib/supabase';
 import { supabase } from '@/lib/supabase';
 import { useUser } from '@/contexts/UserContext';
 
@@ -188,20 +187,24 @@ export default function AuthPage() {
         }
 
         // 1. Criar usuário no Supabase Auth
-        try {
-          await criar_usuario_supabase_auth(formData.email, formData.password);
-          console.log('✅ Usuário criado no Supabase Auth');
-        } catch (authError: any) {
-          console.error('Erro ao criar usuário no Supabase Auth:', authError);
-          setError('Erro ao criar conta. Tente novamente.');
-          setLoading(false);
-          return;
-        }
-
-        // 2. Criar entrada na tabela users do Supabase
-        // Campos: email, nome, is_premium (padrão: false)
         if (supabase) {
           try {
+            const { data: authData, error: authError } = await supabase.auth.signUp({
+              email: formData.email,
+              password: formData.password,
+            });
+
+            if (authError) {
+              console.error('Erro ao criar usuário no Supabase Auth:', authError);
+              setError('Erro ao criar conta. Tente novamente.');
+              setLoading(false);
+              return;
+            }
+
+            console.log('✅ Usuário criado no Supabase Auth');
+
+            // 2. Criar entrada na tabela users do Supabase
+            // Campos: email, nome, is_premium (padrão: false)
             const { error: insertError } = await supabase
               .from('users')
               .insert([
@@ -221,8 +224,8 @@ export default function AuthPage() {
             
             console.log('✅ Usuário criado na tabela users');
           } catch (err) {
-            console.error('Erro ao inserir na tabela users:', err);
-            setError('Erro ao salvar dados do usuário');
+            console.error('Erro ao criar usuário:', err);
+            setError('Erro ao criar conta. Tente novamente.');
             setLoading(false);
             return;
           }

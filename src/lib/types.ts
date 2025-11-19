@@ -1,4 +1,4 @@
-export type ModuleType = 'dashboard' | 'tasks' | 'calendar' | 'finance' | 'ai-assistant' | 'premium' | 'week-planner' | 'focus-mode';
+export type ModuleType = 'dashboard' | 'tasks' | 'calendar' | 'finance' | 'ai-assistant' | 'premium' | 'week-planner' | 'focus-mode' | 'backup';
 
 export interface Task {
   id: string;

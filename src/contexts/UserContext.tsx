@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { supabase } from '@/lib/supabase';
+import { syncAllDataWithCloud } from '@/lib/storage';
 
 interface UserData {
   id: string;
@@ -95,6 +96,11 @@ export function UserProvider({ children }: { children: ReactNode }) {
             is_premium: userData.is_premium,
             source: 'supabase.users.is_premium'
           });
+
+          // 🔄 SINCRONIZAR DADOS DA NUVEM AUTOMATICAMENTE
+          console.log('🔄 Sincronizando dados da nuvem...');
+          await syncAllDataWithCloud();
+          console.log('✅ Dados sincronizados com sucesso!');
         } catch (err) {
           console.error('Erro na conexão com Supabase:', err);
           // Fallback para dados locais

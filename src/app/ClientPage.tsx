@@ -2,20 +2,55 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { CheckSquare, Calendar, DollarSign, LayoutDashboard, Menu, X, Sparkles, Crown, LogOut, Clock, CalendarDays } from 'lucide-react';
-import dynamic from 'next/dynamic';
+import { CheckSquare, Calendar, DollarSign, LayoutDashboard, Menu, X, Sparkles, Crown, LogOut, Clock, CalendarDays, Database } from 'lucide-react';
 import { getTasks, getEvents, getTransactions } from '@/lib/storage';
 import { getCurrentUser, logout } from '@/lib/auth';
 import { ModuleType } from '@/lib/types';
 import { useUser } from '@/contexts/UserContext';
+import { loadAllDataFromSupabase } from '@/lib/supabase-sync';
 
 // Importação dinâmica dos módulos para evitar problemas de SSR
-const TasksModule = dynamic(() => import('@/components/custom/TasksModule'), { ssr: false });
-const CalendarModule = dynamic(() => import('@/components/custom/CalendarModule'), { ssr: false });
-const FinanceModule = dynamic(() => import('@/components/custom/FinanceModule'), { ssr: false });
-const AIAssistant = dynamic(() => import('@/components/custom/AIAssistantModule'), { ssr: false });
-const WeekPlannerModule = dynamic(() => import('@/components/custom/WeekPlannerModule'), { ssr: false });
-const FocusModeModule = dynamic(() => import('@/components/custom/FocusModeModule'), { ssr: false });
+import dynamic from 'next/dynamic';
+
+const TasksModule = dynamic(() => import('@/components/custom/TasksModule'), { 
+  ssr: false,
+  loading: () => <div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div></div>
+});
+
+const CalendarModule = dynamic(() => import('@/components/custom/CalendarModule'), { 
+  ssr: false,
+  loading: () => <div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-500"></div></div>
+});
+
+const FinanceModule = dynamic(() => import('@/components/custom/FinanceModule'), { 
+  ssr: false,
+  loading: () => <div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500"></div></div>
+});
+
+const AIAssistant = dynamic(() => import('@/components/custom/AIAssistantModule'), { 
+  ssr: false,
+  loading: () => <div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"></div></div>
+});
+
+const WeekPlannerModule = dynamic(() => import('@/components/custom/WeekPlannerModule'), { 
+  ssr: false,
+  loading: () => <div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div></div>
+});
+
+const FocusModeModule = dynamic(() => import('@/components/custom/FocusModeModule'), { 
+  ssr: false,
+  loading: () => <div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div></div>
+});
+
+const PremiumModule = dynamic(() => import('@/components/custom/PremiumModule'), { 
+  ssr: false,
+  loading: () => <div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-yellow-500"></div></div>
+});
+
+const BackupModule = dynamic(() => import('@/components/custom/BackupModule'), { 
+  ssr: false,
+  loading: () => <div className="flex items-center justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-500"></div></div>
+});
 
 export default function ClientPage() {
   const router = useRouter();
@@ -45,6 +80,18 @@ export default function ClientPage() {
     // Atualizar dados do usuário do Supabase
     refreshUserData();
 
+    // Carregar dados do Supabase (PC <-> Celular)
+    if (currentUser?.id) {
+      loadAllDataFromSupabase(currentUser.id).then(data => {
+        // Dados carregados do Supabase
+        if (data.tasks.length > 0 || data.events.length > 0 || data.transactions.length > 0) {
+          console.log('✅ Dados carregados do Supabase:', data);
+        }
+      }).catch(err => {
+        console.error('Erro ao carregar dados do Supabase:', err);
+      });
+    }
+
     const tasks = getTasks();
     const events = getEvents();
     const transactions = getTransactions();
@@ -68,7 +115,7 @@ export default function ClientPage() {
       upcomingEvents,
       balance: totalIncome - totalExpense,
     });
-  }, [activeModule, router, refreshUserData]);
+  }, [activeModule, router, refreshUserData, currentUser]);
 
   const handleLogout = () => {
     logout();
@@ -83,6 +130,8 @@ export default function ClientPage() {
     { id: 'week-planner' as ModuleType, label: 'Planejamento', icon: CalendarDays, premium: true },
     { id: 'focus-mode' as ModuleType, label: 'Modo Foco', icon: Clock, premium: true },
     { id: 'ai-assistant' as ModuleType, label: 'Assistente IA', icon: Sparkles, premium: true },
+    { id: 'premium' as ModuleType, label: 'Premium', icon: Crown },
+    { id: 'backup' as ModuleType, label: 'Backup', icon: Database },
   ];
 
   if (isLoading || !localUser) {
@@ -152,6 +201,18 @@ export default function ClientPage() {
         </nav>
 
         <div className="mt-auto pt-6 border-t border-gray-200 dark:border-gray-700 space-y-3">
+          {!isPremium && (
+            <button
+              onClick={() => setActiveModule('premium')}
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg bg-gradient-to-r from-yellow-500 to-orange-600 text-white hover:shadow-lg transition-all"
+            >
+              <Crown className="w-5 h-5" />
+              <div className="text-left">
+                <p className="font-bold text-sm">Upgrade Premium</p>
+                <p className="text-xs opacity-90">R$ 19,90/mês</p>
+              </div>
+            </button>
+          )}
           <button
             onClick={handleLogout}
             className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
@@ -236,6 +297,21 @@ export default function ClientPage() {
                 );
               })}
             </nav>
+            {!isPremium && (
+              <button
+                onClick={() => {
+                  setActiveModule('premium');
+                  setIsMobileMenuOpen(false);
+                }}
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-lg bg-gradient-to-r from-yellow-500 to-orange-600 text-white hover:shadow-lg transition-all"
+              >
+                <Crown className="w-5 h-5" />
+                <div className="text-left">
+                  <p className="font-bold text-sm">Upgrade Premium</p>
+                  <p className="text-xs opacity-90">R$ 19,90/mês</p>
+                </div>
+              </button>
+            )}
             <button
               onClick={handleLogout}
               className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
@@ -413,6 +489,9 @@ export default function ClientPage() {
             </div>
           )
         )}
+        
+        {activeModule === 'premium' && <PremiumModule />}
+        {activeModule === 'backup' && <BackupModule />}
       </main>
     </div>
   );
