@@ -1,98 +1,283 @@
 import { supabase } from './supabase';
-import { getTasks, getEvents, getTransactions, saveTasks, saveEvents, saveTransactions } from './storage';
-import { Task, Event, Transaction } from './types';
+import { Task, CalendarEvent, Transaction } from './types';
 
 /**
  * Sincroniza dados locais com o Supabase (PC <-> Celular)
+ * Usa auth.uid() automaticamente através das políticas RLS
  */
 
 // Salvar tarefas no Supabase
-export async function syncTasksToSupabase(userId: string, tasks: Task[]) {
+export async function syncTasksToSupabase(tasks: Task[]) {
   try {
-    const { error } = await supabase
-      .from('user_data')
-      .upsert({
-        user_id: userId,
-        data_type: 'tasks',
-        data: tasks,
-        updated_at: new Date().toISOString(),
-      });
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      console.warn('⚠️ Usuário não autenticado - sincronização ignorada');
+      return;
+    }
 
-    if (error) throw error;
+    // Primeiro, buscar dados existentes
+    const { data: existing, error: fetchError } = await supabase
+      .from('user_data')
+      .select('*')
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    if (fetchError && fetchError.code !== 'PGRST116') {
+      throw fetchError;
+    }
+
+    if (existing) {
+      // Atualizar registro existente
+      const { error } = await supabase
+        .from('user_data')
+        .update({
+          tasks,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+    } else {
+      // Criar novo registro
+      const { error } = await supabase
+        .from('user_data')
+        .insert({
+          user_id: user.id,
+          tasks,
+          events: [],
+          transactions: [],
+        });
+
+      if (error) throw error;
+    }
+
     console.log('✅ Tarefas sincronizadas com Supabase');
-  } catch (error) {
+  } catch (error: any) {
     console.error('❌ Erro ao sincronizar tarefas:', error);
+    if (error.code === '42501') {
+      console.error('🔒 Políticas RLS não configuradas. Configure as políticas no Supabase.');
+    }
   }
 }
 
 // Salvar eventos no Supabase
-export async function syncEventsToSupabase(userId: string, events: Event[]) {
+export async function syncEventsToSupabase(events: CalendarEvent[]) {
   try {
-    const { error } = await supabase
-      .from('user_data')
-      .upsert({
-        user_id: userId,
-        data_type: 'events',
-        data: events,
-        updated_at: new Date().toISOString(),
-      });
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      console.warn('⚠️ Usuário não autenticado - sincronização ignorada');
+      return;
+    }
 
-    if (error) throw error;
+    // Primeiro, buscar dados existentes
+    const { data: existing, error: fetchError } = await supabase
+      .from('user_data')
+      .select('*')
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    if (fetchError && fetchError.code !== 'PGRST116') {
+      throw fetchError;
+    }
+
+    if (existing) {
+      // Atualizar registro existente
+      const { error } = await supabase
+        .from('user_data')
+        .update({
+          events,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+    } else {
+      // Criar novo registro
+      const { error } = await supabase
+        .from('user_data')
+        .insert({
+          user_id: user.id,
+          tasks: [],
+          events,
+          transactions: [],
+        });
+
+      if (error) throw error;
+    }
+
     console.log('✅ Eventos sincronizados com Supabase');
-  } catch (error) {
+  } catch (error: any) {
     console.error('❌ Erro ao sincronizar eventos:', error);
+    if (error.code === '42501') {
+      console.error('🔒 Políticas RLS não configuradas. Configure as políticas no Supabase.');
+    }
   }
 }
 
 // Salvar transações no Supabase
-export async function syncTransactionsToSupabase(userId: string, transactions: Transaction[]) {
+export async function syncTransactionsToSupabase(transactions: Transaction[]) {
   try {
-    const { error } = await supabase
-      .from('user_data')
-      .upsert({
-        user_id: userId,
-        data_type: 'transactions',
-        data: transactions,
-        updated_at: new Date().toISOString(),
-      });
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      console.warn('⚠️ Usuário não autenticado - sincronização ignorada');
+      return;
+    }
 
-    if (error) throw error;
+    // Primeiro, buscar dados existentes
+    const { data: existing, error: fetchError } = await supabase
+      .from('user_data')
+      .select('*')
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    if (fetchError && fetchError.code !== 'PGRST116') {
+      throw fetchError;
+    }
+
+    if (existing) {
+      // Atualizar registro existente
+      const { error } = await supabase
+        .from('user_data')
+        .update({
+          transactions,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+    } else {
+      // Criar novo registro
+      const { error } = await supabase
+        .from('user_data')
+        .insert({
+          user_id: user.id,
+          tasks: [],
+          events: [],
+          transactions,
+        });
+
+      if (error) throw error;
+    }
+
     console.log('✅ Transações sincronizadas com Supabase');
-  } catch (error) {
+  } catch (error: any) {
     console.error('❌ Erro ao sincronizar transações:', error);
+    if (error.code === '42501') {
+      console.error('🔒 Políticas RLS não configuradas. Configure as políticas no Supabase.');
+    }
   }
 }
 
-// Carregar dados do Supabase
-export async function loadDataFromSupabase(userId: string, dataType: 'tasks' | 'events' | 'transactions') {
+// Carregar tarefas do Supabase
+export async function loadTasksFromSupabase(): Promise<Task[]> {
   try {
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      console.warn('⚠️ Usuário não autenticado - retornando dados vazios');
+      return [];
+    }
+
     const { data, error } = await supabase
       .from('user_data')
-      .select('data')
-      .eq('user_id', userId)
-      .eq('data_type', dataType)
-      .single();
+      .select('tasks')
+      .eq('user_id', user.id)
+      .maybeSingle();
 
-    if (error) throw error;
-    return data?.data || [];
-  } catch (error) {
-    console.error(`❌ Erro ao carregar ${dataType}:`, error);
+    if (error) {
+      if (error.code === 'PGRST116') {
+        return [];
+      }
+      throw error;
+    }
+    
+    return (data?.tasks as Task[]) || [];
+  } catch (error: any) {
+    console.error('❌ Erro ao carregar tarefas:', error);
+    if (error.code === '42501') {
+      console.error('🔒 Políticas RLS não configuradas. Configure as políticas no Supabase.');
+    }
+    return [];
+  }
+}
+
+// Carregar eventos do Supabase
+export async function loadEventsFromSupabase(): Promise<CalendarEvent[]> {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      console.warn('⚠️ Usuário não autenticado - retornando dados vazios');
+      return [];
+    }
+
+    const { data, error } = await supabase
+      .from('user_data')
+      .select('events')
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    if (error) {
+      if (error.code === 'PGRST116') {
+        return [];
+      }
+      throw error;
+    }
+    
+    return (data?.events as CalendarEvent[]) || [];
+  } catch (error: any) {
+    console.error('❌ Erro ao carregar eventos:', error);
+    if (error.code === '42501') {
+      console.error('🔒 Políticas RLS não configuradas. Configure as políticas no Supabase.');
+    }
+    return [];
+  }
+}
+
+// Carregar transações do Supabase
+export async function loadTransactionsFromSupabase(): Promise<Transaction[]> {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      console.warn('⚠️ Usuário não autenticado - retornando dados vazios');
+      return [];
+    }
+
+    const { data, error } = await supabase
+      .from('user_data')
+      .select('transactions')
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    if (error) {
+      if (error.code === 'PGRST116') {
+        return [];
+      }
+      throw error;
+    }
+    
+    return (data?.transactions as Transaction[]) || [];
+  } catch (error: any) {
+    console.error('❌ Erro ao carregar transações:', error);
+    if (error.code === '42501') {
+      console.error('🔒 Políticas RLS não configuradas. Configure as políticas no Supabase.');
+    }
     return [];
   }
 }
 
 // Sincronização completa (carregar do Supabase para localStorage)
-export async function loadAllDataFromSupabase(userId: string) {
+export async function loadAllDataFromSupabase() {
   try {
-    const tasks = await loadDataFromSupabase(userId, 'tasks');
-    const events = await loadDataFromSupabase(userId, 'events');
-    const transactions = await loadDataFromSupabase(userId, 'transactions');
+    const tasks = await loadTasksFromSupabase();
+    const events = await loadEventsFromSupabase();
+    const transactions = await loadTransactionsFromSupabase();
 
-    if (tasks.length > 0) saveTasks(tasks);
-    if (events.length > 0) saveEvents(events);
-    if (transactions.length > 0) saveTransactions(transactions);
-
-    console.log('✅ Dados carregados do Supabase para localStorage');
+    console.log('✅ Dados carregados do Supabase');
     return { tasks, events, transactions };
   } catch (error) {
     console.error('❌ Erro ao carregar dados do Supabase:', error);
@@ -101,18 +286,58 @@ export async function loadAllDataFromSupabase(userId: string) {
 }
 
 // Sincronização completa (salvar do localStorage para Supabase)
-export async function syncAllDataToSupabase(userId: string) {
+export async function syncAllDataToSupabase(tasks: Task[], events: CalendarEvent[], transactions: Transaction[]) {
   try {
-    const tasks = getTasks();
-    const events = getEvents();
-    const transactions = getTransactions();
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      console.warn('⚠️ Usuário não autenticado - sincronização ignorada');
+      return;
+    }
 
-    await syncTasksToSupabase(userId, tasks);
-    await syncEventsToSupabase(userId, events);
-    await syncTransactionsToSupabase(userId, transactions);
+    // Verificar se já existe registro
+    const { data: existing, error: fetchError } = await supabase
+      .from('user_data')
+      .select('*')
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    if (fetchError && fetchError.code !== 'PGRST116') {
+      throw fetchError;
+    }
+
+    if (existing) {
+      // Atualizar registro existente
+      const { error } = await supabase
+        .from('user_data')
+        .update({
+          tasks,
+          events,
+          transactions,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+    } else {
+      // Criar novo registro
+      const { error } = await supabase
+        .from('user_data')
+        .insert({
+          user_id: user.id,
+          tasks,
+          events,
+          transactions,
+        });
+
+      if (error) throw error;
+    }
 
     console.log('✅ Todos os dados sincronizados com Supabase');
-  } catch (error) {
+  } catch (error: any) {
     console.error('❌ Erro ao sincronizar dados:', error);
+    if (error.code === '42501') {
+      console.error('🔒 Políticas RLS não configuradas. Configure as políticas no Supabase.');
+    }
   }
 }

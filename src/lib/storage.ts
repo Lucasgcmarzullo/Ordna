@@ -1,4 +1,4 @@
-// LocalStorage helpers for Odrna com sincronização automática Supabase
+// LocalStorage helpers para Odrna com sincronização automática Supabase
 
 import { Task, CalendarEvent, Transaction, Goal, Reminder, AIInsight, PremiumWidget, UserSubscription } from './types';
 import { 
@@ -51,7 +51,7 @@ export const saveTasks = (tasks: Task[]): void => {
   // Sincronizar com Supabase automaticamente
   const userId = getCurrentUserId();
   if (userId) {
-    syncTasksToSupabase(userId, tasks).catch(err => 
+    syncTasksToSupabase(tasks).catch(err => 
       console.error('Erro ao sincronizar tarefas:', err)
     );
   }
@@ -91,7 +91,7 @@ export const loadTasksFromCloud = async (): Promise<void> => {
   if (!userId) return;
   
   try {
-    const cloudTasks = await loadTasksFromSupabase(userId);
+    const cloudTasks = await loadTasksFromSupabase();
     if (cloudTasks.length > 0) {
       localStorage.setItem(STORAGE_KEYS.TASKS, JSON.stringify(cloudTasks));
       console.log('✅ Tarefas carregadas da nuvem!');
@@ -118,7 +118,7 @@ export const saveEvents = (events: CalendarEvent[]): void => {
   // Sincronizar com Supabase automaticamente
   const userId = getCurrentUserId();
   if (userId) {
-    syncEventsToSupabase(userId, events).catch(err => 
+    syncEventsToSupabase(events).catch(err => 
       console.error('Erro ao sincronizar eventos:', err)
     );
   }
@@ -157,7 +157,7 @@ export const loadEventsFromCloud = async (): Promise<void> => {
   if (!userId) return;
   
   try {
-    const cloudEvents = await loadEventsFromSupabase(userId);
+    const cloudEvents = await loadEventsFromSupabase();
     if (cloudEvents.length > 0) {
       localStorage.setItem(STORAGE_KEYS.EVENTS, JSON.stringify(cloudEvents));
       console.log('✅ Eventos carregados da nuvem!');
@@ -184,7 +184,7 @@ export const saveTransactions = (transactions: Transaction[]): void => {
   // Sincronizar com Supabase automaticamente
   const userId = getCurrentUserId();
   if (userId) {
-    syncTransactionsToSupabase(userId, transactions).catch(err => 
+    syncTransactionsToSupabase(transactions).catch(err => 
       console.error('Erro ao sincronizar transações:', err)
     );
   }
@@ -230,7 +230,7 @@ export const loadTransactionsFromCloud = async (): Promise<void> => {
   if (!userId) return;
   
   try {
-    const cloudTransactions = await loadTransactionsFromSupabase(userId);
+    const cloudTransactions = await loadTransactionsFromSupabase();
     if (cloudTransactions.length > 0) {
       localStorage.setItem(STORAGE_KEYS.TRANSACTIONS, JSON.stringify(cloudTransactions));
       console.log('✅ Transações carregadas da nuvem!');

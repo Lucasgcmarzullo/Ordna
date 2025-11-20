@@ -82,13 +82,13 @@ export default function ClientPage() {
 
     // Carregar dados do Supabase (PC <-> Celular)
     if (currentUser?.id) {
-      loadAllDataFromSupabase(currentUser.id).then(data => {
+      loadAllDataFromSupabase().then(data => {
         // Dados carregados do Supabase
         if (data.tasks.length > 0 || data.events.length > 0 || data.transactions.length > 0) {
           console.log('✅ Dados carregados do Supabase:', data);
         }
       }).catch(err => {
-        console.error('Erro ao carregar dados do Supabase:', err);
+        console.error('❌ Erro ao carregar dados do Supabase:', err);
       });
     }
 
@@ -329,7 +329,7 @@ export default function ClientPage() {
           <div className="space-y-6">
             <div>
               <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2">
-                Bem-vindo, {localUser.name.split(' ')[0]}! 👋
+                Bem-vindo, {localUser.name?.split(' ')[0] || localUser.email?.split('@')[0] || 'Usuário'}! 👋
               </h2>
               <p className="text-gray-600 dark:text-gray-400">
                 Seu espaço de organização pessoal completo

@@ -4,6 +4,9 @@ const nextConfig: NextConfig = {
   /* config options here */
   reactStrictMode: true,
   
+  // Configuração para deploy standalone (sem Vercel)
+  output: 'standalone',
+  
   // Configurações para reduzir erros de rede no console durante desenvolvimento
   onDemandEntries: {
     // Período em ms para manter páginas em memória
@@ -26,8 +29,23 @@ const nextConfig: NextConfig = {
         aggregateTimeout: 300,
       };
     }
+    
+    // Resolver problemas de importação circular
+    config.resolve = {
+      ...config.resolve,
+      fallback: {
+        ...config.resolve?.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+      },
+    };
+    
     return config;
   },
+  
+  // Configurações de transpilação
+  transpilePackages: ['@supabase/supabase-js'],
 };
 
 export default nextConfig;

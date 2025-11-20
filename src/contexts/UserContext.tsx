@@ -62,7 +62,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
             const userData: UserData = {
               id: user.id,
               email: user.email,
-              nome: user.name || user.email.split('@')[0],
+              nome: user.nome || user.name || user.email.split('@')[0],
               is_premium: user.is_premium || false
             };
             setCurrentUser(userData);
@@ -87,7 +87,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
           localStorage.setItem('odrna_current_user', JSON.stringify({
             id: userData.id,
             email: userData.email,
-            name: userData.nome,
+            nome: userData.nome,
             is_premium: userData.is_premium
           }));
 
@@ -107,7 +107,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
           const userData: UserData = {
             id: user.id,
             email: user.email,
-            nome: user.name || user.email.split('@')[0],
+            nome: user.nome || user.name || user.email.split('@')[0],
             is_premium: user.is_premium || false
           };
           setCurrentUser(userData);
@@ -118,7 +118,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
         const userData: UserData = {
           id: user.id,
           email: user.email,
-          nome: user.name || user.email.split('@')[0],
+          nome: user.nome || user.name || user.email.split('@')[0],
           is_premium: user.is_premium || false
         };
         setCurrentUser(userData);

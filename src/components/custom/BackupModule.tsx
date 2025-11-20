@@ -39,7 +39,7 @@ export default function BackupModule() {
         timestamp: new Date().toISOString(),
         user: {
           email: currentUser?.email || '',
-          name: currentUser?.name || '',
+          name: currentUser?.nome || '',
         },
         data: {
           tasks,
